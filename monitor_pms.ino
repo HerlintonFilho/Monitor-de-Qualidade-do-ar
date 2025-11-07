@@ -2,7 +2,7 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
 
-// OLED ------------------------------------------------------------------------
+
 #define SCREEN_WIDTH 128
 #define SCREEN_HEIGHT 64
 #define SDA_PIN 21
@@ -10,15 +10,15 @@
 
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
 
-// PMS5003 ---------------------------------------------------------------------
-HardwareSerial pmsSerial(2);   // Usando UART2 do ESP32
+
+HardwareSerial pmsSerial(2);   
 
 #define PMS_RX 35  // PMS -> ESP32 (recepção no ESP)
 #define PMS_TX 34  // ESP32 -> PMS (transmissão do ESP)
 
-uint8_t buf[32]; // buffer para frame de dados
+uint8_t buf[32]; 
 
-// LED onboard
+
 #define LED_PIN 2
 
 void setup() {
@@ -38,7 +38,7 @@ void setup() {
   display.setTextSize(1);
   display.setTextColor(WHITE);
 
-  // Inicializa comunicação com o PMS5003 (baud rate padrão 9600)
+  // Inicializa comunicação com o PMS5003
   pmsSerial.begin(9600, SERIAL_8N1, PMS_RX, PMS_TX);
 
   Serial.println("✅ Sistema iniciado, aguardando dados do PMS5003...");
@@ -48,18 +48,18 @@ void loop() {
 
   if (pmsSerial.available() >= 32) {
 
-    if (pmsSerial.read() == 0x42) {   // Primeiro byte do frame
+    if (pmsSerial.read() == 0x42) {   
       buf[0] = 0x42;
 
-      if (pmsSerial.read() == 0x4d) { // Segundo byte do frame
+      if (pmsSerial.read() == 0x4d) {
         buf[1] = 0x4d;
 
-        // Lê o restante dos 30 bytes do frame
+       
         for (int i = 2; i < 32; i++) {
           buf[i] = pmsSerial.read();
         }
 
-        // Decodifica PM2.5 e PM10 (bytes específicos do frame PMS5003)
+        
         int pm25 = (buf[12] << 8) | buf[13];
         int pm10 = (buf[14] << 8) | buf[15];
 
